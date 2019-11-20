@@ -3,18 +3,22 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-
+    <tab-control :titles="['流行','新款','精选']"
+                 @tabClick="tabClick"
+                 ref="tabControl1"
+                 class="tab-control"
+                 v-show="isTabFixed"></tab-control>
     <scroll class="content" ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
             :pull-up-load="true"
             @pullingUp="loadMore">
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
       <recommend-view :recommends="recommends" />
       <feature-view></feature-view>
-      <tab-control class="tab-control"
-                   :titles="['流行','新款','精选']"
-                   @tabClick="tabClick"></tab-control>
+      <tab-control :titles="['流行','新款','精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl2"></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
 
@@ -34,7 +38,7 @@
   import BackTop from "components/content/backTop/BackTop";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
-
+  import debounce from "../../common/utils";
 
   export default {
     name: "Home",
@@ -58,11 +62,32 @@
           'sell':{page:0,list:[]},
         },
         currentType:'pop',
-        isShowBackTop:false
+        isShowBackTop:false,
+        tabOffsetTop:0,
+        isTabFixed:false,
+        saveY:0,
       }
     },
+    computed:{
+      showGoods(){
+        return this.goods[this.currentType].list
+      }
+    },
+    destroyed(){
+      console.log('home destroyed')
+    },
+    activated(){
+      this.$refs.scroll.scrollTo(0,this.saveY,0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated(){
+      this.saveY=this.$refs.scroll.getScrollY()
+    },
+
     created() {
+      //1.请求多个数据
       this.getHomeMultidata()
+
       //2.请求商品数据
       // let type = ['pop','new','sell']
       // type.forEach(function (value) {
@@ -71,12 +96,26 @@
       this.getHomeGoods('pop')
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
+
     },
+    mounted(){
+      //1. 图片记载完成的事件监听
+      const refresh = debounce(this.$refs.scroll.refresh,200)
+      //监听item中图片加载完成
+      this.$bus.$on('itemImageLoad',()=>{
+        refresh()
+      })
+
+      //2. 获取tabControl 的offsetTop
+      // 所有的组件都有一个属性$el:用于获取组件的元素
+    },
+
     methods:{
       /**
-       *是将监听相关的方法
+       *事件监听相关的方法
        */
-       tabClick(index){
+
+      tabClick(index){
         switch (index) {
           case 0:
             this.currentType = 'pop'
@@ -88,23 +127,27 @@
             this.currentType = 'sell'
             break
         }
-        // let tabCtype = ['pop','new','sell']
-        // this.currentType = tabCtype[index]
+        this.$refs.tabControl1.currentIndex = index
+        this.$refs.tabControl2.currentIndex = index
       },
       backClick(){
          this.$refs.scroll.scrollTo(0,0,500)
       },
       contentScroll(position){
+         //1.判断backTop是否显示
          -position.y>800?this.isShowBackTop=true:this.isShowBackTop=false
+
+        //2.决定tabControl是否吸顶
+        this.isTabFixed = (-position.y)>this.tabOffsetTop
       },
       loadMore(){
         // console.log('上拉加载');
         this.getHomeGoods(this.currentType)
-
         // this.$refs.scroll.scroll.refresh()
       },
-
-
+      swiperImageLoad(){
+         this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+      },
 
       /**
        * 网络请求相关方法
@@ -125,13 +168,9 @@
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page+=1
 
+          //完成上拉加载更多
           this.$refs.scroll.finishPullUp()
         })
-      }
-    },
-    computed:{
-      showGoods(){
-        return this.goods[this.currentType].list
       }
     }
   }
@@ -139,26 +178,28 @@
 
 <style scoped>
   #home{
-    padding-top: 44px;
     height: 100vh;
     position: relative;
   }
   .home-nav{
     background-color: var(--color-tint);
     color:#fff;
-
-    position: fixed;
-    left:0;
-    right: 0;
-    top:0;
+    position: relative;
     z-index: 9;
+
+    /*再使用原生滚动时*/
+    /*position: fixed;*/
+    /*left:0;*/
+    /*right: 0;*/
+    /*top:0;*/
+    /*z-index: 9;*/
   }
 
-  .tab-control{
-    position: sticky;
-    top:44px;
-    z-index: 9;
-  }
+  /*.tab-control{*/
+  /*  position: sticky;*/
+  /*  top:44px;*/
+  /*  z-index: 9;*/
+  /*}*/
 
   .content{
     position: absolute;
@@ -166,6 +207,11 @@
     bottom: 49px;
     left: 0;
     right: 0;
+  }
+
+  .tab-control{
+    position: relative;
+    z-index: 9;
   }
 
   /*.content{*/
