@@ -10,7 +10,7 @@
              :class="{active:index===currentIndex}"
              @click="titClick(index)">{{item}}</div>
       </div>
-  </nav-bar>
+    </nav-bar>
   </div>
 </template>
 
@@ -31,7 +31,8 @@
     },
     methods:{
       titClick(index){
-        this.currentIndex=index
+        this.currentIndex=index;
+        this.$emit('titleClick',index);
       },
       backClick(){
         this.$router.back()
