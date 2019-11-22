@@ -1,61 +1,69 @@
 <template>
-  <div>
-    <nav-bar>
-      <div slot="left" class="back" @click="backClick">
-        <img src="~assets/img/common/back.svg" alt="">
+  <nav-bar>
+    <img slot="left" class="back" @click="backClick" src="~assets/img/common/back.svg" alt="">
+    <div slot="center" class="title">
+      <div class="title-item"
+           v-for="(item, index) in titles"
+           @click="titleClick(index)"
+           :class="{active: currentIndex === index}">
+        {{item}}
       </div>
-      <div slot="center" class="title">
-        <div v-for="(item,index) in titles"
-             class="title-item"
-             :class="{active:index===currentIndex}"
-             @click="titClick(index)">{{item}}</div>
-      </div>
-    </nav-bar>
-  </div>
+    </div>
+  </nav-bar>
 </template>
 
 <script>
-  import NavBar from "components/common/navbar/NavBar";
+  import NavBar from 'components/common/navbar/NavBar'
 
-
-  export default {
-    name: "DetailNavBar",
-    components:{
-      NavBar
-    },
-    data(){
-      return{
-        titles:['商品','参数','评论','推荐'],
-        currentIndex:0,
+	export default {
+		name: "DetailNavBar",
+    props: {
+			titles: {
+				type: Array,
+        default: () => {
+        	return ['商品', '参数', '评论', '推荐']
+        }
+      },
+      currentIndex: {
+				type: Number,
+        default: 0
       }
     },
-    methods:{
-      titClick(index){
-        this.currentIndex=index;
-        this.$emit('titleClick',index);
+    // data() {
+			// return {
+			// 	currentIndex: 0
+    //   }
+    // },
+    components: {
+			NavBar
+    },
+    methods: {
+	    backClick() {
+	    	this.$router.back()
       },
-      backClick(){
-        this.$router.back()
+	    titleClick(index) {
+        this.$emit('titleClick', index)
       }
     }
-  }
+	}
 </script>
 
 <style scoped>
-  .title{
+  .back {
+    margin-top: 12px;
+  }
+
+  .title {
     display: flex;
-    font-size: 13px;
+    padding: 0 20px;
   }
 
-  .title-item{
-    flex: auto;
+  .title-item {
+    flex: 1;
+    font-size: 14px;
   }
 
-  .active{
-    color:var(--color-high-text)
-  }
-
-  .back img{
-    margin-top: 10px;
+  .title-item.active {
+    color: var(--color-high-text)
   }
 </style>

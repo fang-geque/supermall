@@ -25,10 +25,7 @@
 		name: "DetailBaseInfo",
     props: {
 		  goods: {
-		    type: Object,
-        default(){
-		      return {}
-        }
+		    type: Object
       }
     }
 	}

@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item" @click="itemClick">
-    <img :src="showImage" alt="" @load="imageLoad">
+    <img @load="imgLoad" v-lazy="showImage" :key="showImage" alt="">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -12,28 +12,30 @@
 <script>
   export default {
     name: "GoodsListItem",
-    props:{
-      goodsItem:{
-        type:Object,
-        default(){
-          return []
+    props: {
+      goodsItem: {
+        type: Object,
+        default() {
+          return {}
         }
       }
     },
-    computed:{
-      showImage(){
-        return this.goodsItem.img || this.goodsItem.image || this.goodsItem.show.img
+    computed: {
+    	showImage() {
+    		return this.goodsItem.img || this.goodsItem.image || this.goodsItem.show.img
       }
     },
-    methods:{
-      imageLoad(){
-        // console.log('imageload');
-        this.$bus.$emit('itemImgLoad')
+    methods: {
+      itemClick() {
+        // 1.获取iid
+        const iid = this.goodsItem.iid;
+        // 2.跳转到详情页面
+        this.$router.push({path: '/detail', query: {iid}})
       },
-      itemClick(){
-        this.$router.push('/detail/'+this.goodsItem.iid)
-      }
-    },
+	    imgLoad() {
+		    this.$bus.$emit('imgLoad')
+	    }
+    }
   }
 </script>
 
@@ -41,12 +43,13 @@
   .goods-item {
     padding-bottom: 40px;
     position: relative;
-    width: 48%;
   }
+
   .goods-item img {
     width: 100%;
     border-radius: 5px;
   }
+
   .goods-info {
     font-size: 12px;
     position: absolute;
@@ -56,19 +59,23 @@
     overflow: hidden;
     text-align: center;
   }
+
   .goods-info p {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-bottom: 3px;
   }
+
   .goods-info .price {
     color: var(--color-high-text);
     margin-right: 20px;
   }
+
   .goods-info .collect {
     position: relative;
   }
+
   .goods-info .collect::before {
     content: '';
     position: absolute;

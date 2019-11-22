@@ -1,13 +1,21 @@
 import Vue from 'vue'
 import App from './App.vue'
-import router from "./router";
+import router from './router'
+import store from './store'
+import Toast from 'components/common/toast'
+import LazyLoad from 'vue-lazyload'
 
 Vue.config.productionTip = false
 
-//事件总线
 Vue.prototype.$bus = new Vue()
+
+Vue.use(Toast)
+Vue.use(LazyLoad, {
+  loading: require('assets/img/common/Neeko.png')
+})
 
 new Vue({
   render: h => h(App),
   router,
+  store
 }).$mount('#app')

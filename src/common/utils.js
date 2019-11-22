@@ -1,15 +1,4 @@
-export function debounce(func,delay) {
-  let timer = null;
-  return function (...args) {
-    if(timer)clearTimeout(timer)
-    timer = setTimeout(()=>{
-      func.apply(this,args)
-    },delay)
-  }
-}
-
 export function formatDate(date, fmt) {
-  //获取年份
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
@@ -32,3 +21,4 @@ export function formatDate(date, fmt) {
 function padLeftZero (str) {
   return ('00' + str).substr(str.length);
 };
+

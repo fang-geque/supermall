@@ -13,7 +13,7 @@
 </script>
 
 <style scoped>
-  .feature img{
+  .feature img {
     width: 100%;
   }
 </style>

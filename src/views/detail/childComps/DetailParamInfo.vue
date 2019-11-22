@@ -15,7 +15,6 @@
     <div class="info-img" v-if="paramInfo.image.length !== 0">
       <img :src="paramInfo.image" alt="">
     </div>
-
   </div>
 </template>
 
@@ -24,10 +23,7 @@
 		name: "DetailParamInfo",
     props: {
 		  paramInfo: {
-		    type: Object,
-        default(){
-          return {}
-        }
+		    type: Object
       }
     }
 	}

@@ -1,13 +1,17 @@
+const path = require('path')
+
+
 module.exports = {
-  configureWebpack:{
-    resolve:{
-      alias:{
-        'assets':'@/assets',
-        'common':'@/common',
-        'components':'@/components',
-        'network':'@/network',
-        'views':'@/views',
+  configureWebpack: {
+    resolve: {
+      alias: {
+        'views': '@/views',
+        'components': '@/components',
+        'network': '@/network',
+        'common': '@/common',
+        'assets': '@/assets',
       }
     }
-  }
+  },
+  baseUrl:'./'
 }
